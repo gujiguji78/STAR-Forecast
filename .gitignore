@@ -1,0 +1,111 @@
+# PyCharm IDE文件
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+pythonenv*
+
+# 包和构建文件
+*.egg-info/
+dist/
+build/
+pip-wheel-metadata/
+*.egg
+.eggs/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# 数据文件 - 绝对不上传的
+data/raw/           # 原始数据文件（通常很大）
+*.csv              # CSV文件（如果有样本数据，单独处理）
+*.h5
+*.hdf5
+*.npy
+*.npz
+*.pkl
+*.pickle
+*.feather
+*.parquet
+
+# 环境变量和配置文件
+.env
+.env.*
+.local.env
+secrets/
+credentials/
+config.local.yaml
+config.local.yml
+
+# 模型文件（通常很大）
+models/*.pth
+models/*.pt
+models/*.bin
+models/*.onnx
+models/checkpoints/
+models/saved_models/
+
+# 日志文件
+logs/
+*.log
+log/
+lightning_logs/
+wandb/
+mlruns/
+
+# 临时文件
+*.tmp
+*.temp
+*~
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 操作系统文件
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+[Dd]esktop.ini
+
+# 测试覆盖
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.tox/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+*.ipynb
+
+# 压缩文件
+*.zip
+*.tar.gz
+*.7z
+*.rar
+
+# 项目特定文件
+# 如果有需要忽略的其他项目文件，在这里添加
+
+# 大型文件（>50MB）
+*.large
+*.huge

@@ -1,0 +1,71 @@
+# STAR-Forecast 配置
+project:
+  name: "STAR-Forecast"
+  version: "1.0.0"
+  description: "神经-符号-强化三重协同自适应时序预测"
+
+# 硬件配置
+hardware:
+  device: "cuda:0"
+  seed: 42
+  num_workers: 4
+  mixed_precision: true
+  gradient_clip: 1.0
+
+# 数据配置
+data:
+  dataset: "ETTh1"
+  data_path: "./data/ETTh1.csv"
+  seq_len: 96
+  pred_len: 24
+  batch_size: 32
+  split_ratio: [0.7, 0.1, 0.2]
+  normalize: true
+
+# ISTR网络配置
+istr:
+  input_dim: 7
+  hidden_dim: 64
+  num_blocks: 3
+  kernel_size: 3
+  dilation_base: 2
+  dropout: 0.1
+  laplacian_weight: 0.01
+  trainable_ratio: 0.01
+
+# 预测头配置
+predictor:
+  hidden_dim: 64
+  num_layers: 2
+  dropout: 0.1
+
+# 训练配置
+training:
+  epochs: 100
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  patience: 20
+
+  scheduler:
+    type: "ReduceLROnPlateau"
+    patience: 10
+    factor: 0.5
+    min_lr: 0.00001
+
+  early_stopping:
+    patience: 20
+    min_delta: 0.0001
+
+# 评估配置
+evaluation:
+  test_batch_size: 32
+  metrics: ["MSE", "MAE", "RMSE"]
+  save_predictions: true
+
+# 日志配置
+logging:
+  log_dir: "./logs"
+  checkpoint_dir: "./checkpoints"
+  tensorboard: true
+  save_interval: 10
+  log_level: "INFO"
