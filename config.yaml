@@ -1,0 +1,104 @@
+# ========= 基础 =========
+model_name: "TimeSeriesLaplaceTCNLLM"
+seed: 42
+
+device:
+  prefer_cuda: true
+  amp: true                 # 混合精度（4060建议true）
+
+# ========= 数据 =========
+data:
+  train_glob: "data/train/*.csv"
+  val_glob: "data/val/*.csv"
+  test_glob: "data/test/*.csv"
+
+  # CSV读取配置（按你的真实数据调整）
+  time_col: "date"                 # 没有就写 null
+  target_col: "T (degC)"           # ★必须加引号（含空格/括号）
+  feature_cols: null               # 多变量：["f1","f2",...]; null=单目标列
+
+  normalize: "zscore"              # "zscore" 或 "minmax"
+  dropna: true
+
+  # 可选：强制指定输入特征维度（优先级低于 feature_cols 推断）
+  num_features_override: null      # 例如 8
+
+# ========= 任务 =========
+task:
+  seq_len: 100
+  horizon: 10
+
+# ========= 模型维度（可选，建议留 null 让代码自动从数据推断） =========
+model:
+  input_dim: null                  # 单变量=1，多变量=特征数
+
+# ========= Laplace 编码器 =========
+laplace:
+  hidden_dim: 32
+  n_neighbors: 10                  # 如果你的 LaplaceEncoder 不支持，代码会自动忽略
+  sigma: 1.0
+  use_graph_laplace: false
+
+# ========= TCN =========
+tcn:
+  channels: [32, 64, 128]
+  kernel_size: 3
+  dropout: 0.2
+  output_size: 64
+
+# ========= 融合 + 回归头 =========
+fusion:
+  hidden_dim: 256
+  dropout: 0.2
+
+regression:
+  hidden_dim: 128
+
+# ========= 训练 =========
+training:
+  epochs: 20
+  batch_size: 32
+  learning_rate: 0.0005
+  weight_decay: 0.0001
+  grad_clip: 1.0
+  log_every: 50
+
+  early_stop:
+    enabled: true
+    patience: 5
+    metric: "val_mse"
+
+# ========= LLM =========
+llm:
+  enabled: true
+  model_path: "C:/hf_models/Qwen2.5-1.5B-Instruct"
+  local_files_only: true
+  trust_remote_code: true
+
+  # Windows bitsandbytes 不稳定：建议 false
+  use_4bit: false
+
+  generation:
+    max_new_tokens: 200
+    temperature: 0.3
+    top_p: 0.9
+    do_sample: true
+
+  # ★用 YAML 多行块，保证合法解析
+  prompt_template: |
+    你是时间序列分析助手。
+    已知输入序列的统计特征如下：
+    - 均值: {mean:.4f}
+    - 标准差: {std:.4f}
+    - 最小值: {min:.4f}
+    - 最大值: {max:.4f}
+    - 线性趋势斜率: {slope:.6f}
+
+    模型预测未来 {horizon} 步的数值为：
+    {preds}
+
+    请输出：
+    1) 趋势判断（上升/下降/平稳）
+    2) 波动性判断（高/中/低）
+    3) 是否可能存在异常点
+    4) 对预测可信度做一句话说明
